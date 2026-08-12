@@ -27,6 +27,8 @@
 
 // Library header
 #include "hV_Board.h"
+#include "hV_HAL_Peripherals.h"
+
 
 hV_Board::hV_Board()
 {
@@ -91,7 +93,7 @@ void hV_Board::b_resume()
         }
 
         // Configure GPIOs
-        hV_HAL_GPIO_define(b_pin.panelBusy, INPUT);
+        //hV_HAL_GPIO_define(b_pin.panelBusy, INPUT);
 
         hV_HAL_GPIO_define(b_pin.panelDC, OUTPUT);
         hV_HAL_GPIO_set(b_pin.panelDC);
@@ -135,7 +137,7 @@ void hV_Board::b_resume()
         {
             if (b_pin.button != NOT_CONNECTED) // generic
             {
-                hV_HAL_GPIO_define(b_pin.button, INPUT_PULLUP);
+                //hV_HAL_GPIO_define(b_pin.button, INPUT_PULLUP);
             }
 
             if (b_pin.ledData != NOT_CONNECTED) // generic
@@ -372,13 +374,14 @@ void hV_Board::b_sendCommand8(uint8_t command)
 void hV_Board::b_sendCommandData8(uint8_t command, uint8_t data)
 {
     // For an unknown reason, extra delay required for some MCUs
-    hV_HAL_delayMilliseconds(1); // Ensure minimum timing
+    hV_HAL_delayMilliseconds(10); // Ensure minimum timing
 
     hV_HAL_GPIO_clear(b_pin.panelDC); // LOW = command
     hV_HAL_GPIO_clear(b_pin.panelCS);
 
     hV_HAL_SPI_transfer(command);
-
+    
+    hV_HAL_delayMicroseconds(10);
     hV_HAL_GPIO_set(b_pin.panelDC); // HIGH = data
     hV_HAL_SPI_transfer(data);
 
